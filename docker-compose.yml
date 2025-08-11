@@ -1,0 +1,23 @@
+networks:
+  auth_network:
+    name: auth_network
+    driver: bridge
+
+services:
+  auth_database:
+    networks:
+      - auth_network
+    image: postgres:17
+    container_name: auth_database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: thn
+      POSTGRES_PASSWORD: 100700
+      POSTGRES_DB: auth
+    volumes:
+      - auth_database:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  auth_database:
