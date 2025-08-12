@@ -18,15 +18,6 @@ import {PaginationDto} from "../common/dtos";
 export class UserController{
     constructor(private readonly userService: UserService){}
 
-    @Post()
-    @ApiOperation({ summary: 'Create User' })
-    @ApiCreatedResponse({description: 'User created successfully.'})
-    @ApiConflictResponse({description: 'User already exists'})
-    @ApiInternalServerErrorResponse({description: 'Internal Server Error'})
-    async create(@Body() payload: CreateUserDto){
-        return await this.userService.create(payload);
-    }
-
     @Get()
     @ApiOperation({ summary: 'Get all users' })
     @ApiOkResponse({description: 'Get all users successfully.'})

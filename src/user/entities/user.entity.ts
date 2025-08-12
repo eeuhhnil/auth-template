@@ -1,4 +1,5 @@
 import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {UserRole} from "../enums";
 
 @Entity('users')
 export class User {
@@ -11,8 +12,17 @@ export class User {
     @Column()
     name: string;
 
+    @Column({
+        type: 'enum',
+        enum: UserRole,
+        default: UserRole.USER,
+    })
+
     @Column()
     hashPassword: string;
+
+    @Column({ name: 'refresh_token', nullable: true })
+    refreshToken: string;
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;

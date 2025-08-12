@@ -1,7 +1,7 @@
 import {ConflictException, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "./entities/user.entity";
-import {Repository} from "typeorm";
+import {FindOneOptions, Repository} from "typeorm";
 import * as bcrypt from 'bcrypt'
 import {CreateUserDto, QueryUserDto, UpdateUserDto} from "./dtos/user.dto";
 import {PaginationMetadata} from "../common/interceptors";
@@ -12,26 +12,6 @@ export class UserService {
         @InjectRepository(User)
         private userRepository: Repository<User>,
     ){}
-
-    async create(payload: CreateUserDto): Promise<User>{
-        const existing = await this.userRepository.exists({
-            where: {
-                email: payload.email
-            }
-        })
-
-        if(existing){
-            throw new ConflictException("Email already exists")
-        }
-
-        const user = this.userRepository.create({
-            email: payload.email,
-            name: payload.name,
-            hashPassword: bcrypt.hashSync(payload.password, 10)
-        });
-
-        return this.userRepository.save(user);
-    }
 
     async findMany(query: QueryUserDto): Promise<{data: User[], meta: PaginationMetadata}>{
         const  {page = 1, limit =  10, search} = query
@@ -73,6 +53,18 @@ export class UserService {
         return safeUser;
     }
 
+    async findOne(
+        filter: FindOneOptions<User>,
+        options: { select?: (keyof User)[] } = {},
+    ): Promise<User | null> {
+        const findOptions: FindOneOptions<User> = {
+            ...filter,
+            select: options.select,
+        };
+        return this.userRepository.findOne(findOptions);
+    }
+
+
     async updateById(id: number, payload: UpdateUserDto): Promise<Omit<User, 'hashPassword'>> {
 
         const hashPassword = bcrypt.hashSync(payload.password, 10)
@@ -103,4 +95,5 @@ export class UserService {
 
         return this.userRepository.remove(user);
     }
+
 }
