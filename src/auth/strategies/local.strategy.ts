@@ -8,26 +8,26 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
-    constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
-    ) {
-        super({ usernameField: 'email' });
-    }
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {
+    super({ usernameField: 'email' });
+  }
 
-    async validate(email: string, password: string): Promise<any> {
-        const user = await this.userRepository.findOne({
-            where: { email },
-            select: ['id', 'email', 'name', 'createdAt', 'updatedAt', 'hashPassword'],
-        });
+  async validate(email: string, password: string): Promise<any> {
+    const user = await this.userRepository.findOne({
+      where: { email },
+      select: ['id', 'email', 'name', 'createdAt', 'updatedAt', 'hashPassword'],
+    });
 
-        if (user && user.hashPassword) {
-            const isMatch = await bcrypt.compareSync(password, user.hashPassword);
-            if (isMatch) {
-                const { hashPassword, ...result } = user;
-                return result;
-            }
-        }
-        throw new UnauthorizedException('Invalid credentials');
+    if (user && user.hashPassword) {
+      const isMatch = bcrypt.compareSync(password, user.hashPassword);
+      if (isMatch) {
+        const { hashPassword, ...result } = user;
+        return result;
+      }
     }
+    throw new UnauthorizedException('Invalid credentials');
+  }
 }

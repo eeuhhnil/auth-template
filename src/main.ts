@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {ConfigService} from "@nestjs/config";
-import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
-import {ValidationPipe} from "@nestjs/common";
-import {ErrorInterceptor, TransformInterceptor} from "./common/interceptors";
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
+import { ErrorInterceptor, TransformInterceptor } from './common/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,43 +14,43 @@ async function bootstrap() {
     allowedHeaders: '*',
     origin: '*',
     credentials: true,
-  })
+  });
 
   // validation pipe
   app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
-  )
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
 
   // interceptor
-  app.useGlobalInterceptors(new TransformInterceptor(), new ErrorInterceptor())
+  app.useGlobalInterceptors(new TransformInterceptor(), new ErrorInterceptor());
 
   //OpenAPI
   const swaggerConfig = new DocumentBuilder()
-      .setTitle('auth template')
-      .setDescription('This is auth template')
-      .addServer(
-          `http://localhost:${config.get('PORT')}`,
-          `Development API[PORT=${config.get('PORT')}]`,
-      )
-      .setVersion('1.0.0')
-      .addBearerAuth({
-        description: `Please enter token in following format: Bearer <JWT>`,
-        name: 'Authorization',
-        bearerFormat: 'Bearer',
-        scheme: 'Bearer',
-        type: 'http',
-        in: 'Header',
-      })
-      .build()
+    .setTitle('auth template')
+    .setDescription('This is auth template')
+    .addServer(
+      `http://localhost:${config.get('PORT')}`,
+      `Development API[PORT=${config.get('PORT')}]`,
+    )
+    .setVersion('1.0.0')
+    .addBearerAuth({
+      description: `Please enter token in following format: Bearer <JWT>`,
+      name: 'Authorization',
+      bearerFormat: 'Bearer',
+      scheme: 'Bearer',
+      type: 'http',
+      in: 'Header',
+    })
+    .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig, {
     deepScanRoutes: true,
-  })
+  });
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
@@ -58,12 +58,12 @@ async function bootstrap() {
         docExpansion: 'none',
       },
     },
-  })
+  });
 
-  await app.listen(config.get<number>('PORT') ?? 3000)
+  await app.listen(config.get<number>('PORT') ?? 3000);
 
-  return app.getUrl()
+  return app.getUrl();
 }
 void bootstrap().then((url) => {
-  console.log(`Server is running on: ${url}`)
-})
+  console.log(`Server is running on: ${url}`);
+});

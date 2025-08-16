@@ -1,32 +1,39 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
-import {UserRole} from "../enums";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserRole } from '../enums';
 
 @Entity('users')
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({unique: true})
-    email: string;
+  @Column({ unique: true })
+  email: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column({
-        type: 'enum',
-        enum: UserRole,
-        default: UserRole.USER,
-    })
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 
-    @Column()
-    hashPassword: string;
+  @Column()
+  hashPassword: string;
 
-    @Column({ name: 'refresh_token', nullable: true })
-    refreshToken: string;
+  @Column({ name: 'refresh_token', nullable: true })
+  refreshToken: string;
 
-    @CreateDateColumn({ type: "timestamp" })
-    createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 
-    @UpdateDateColumn({ type: "timestamp" })
-    updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 }
