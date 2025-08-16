@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  NotFoundException,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginDto, RefreshTokenDto, RegisterLocalDto } from './dtos';
 import { AuthService } from './auth.service';
@@ -46,5 +53,20 @@ export class AuthController {
   @Post('/refresh')
   async refresh(@Body() payload: RefreshTokenDto) {
     return this.authService.jwtRefreshToken(payload.refresh_token);
+  }
+
+  @Post('/logout')
+  async logout(@Req() req, @Body() payload: RefreshTokenDto) {
+    const authHeader = req.headers.authorization;
+    const accessToken: string | undefined = authHeader?.split(' ')[1];
+    if (!accessToken) {
+      throw new NotFoundException('No access token found in request');
+    }
+
+    await this.authService.logout(accessToken, payload.refresh_token);
+
+    return {
+      message: 'Logout successfully',
+    };
   }
 }
