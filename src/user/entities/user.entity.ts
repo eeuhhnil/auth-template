@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../enums';
+import { Session } from '../../session/entities';
 
 @Entity('users')
 export class User {
@@ -30,6 +32,9 @@ export class User {
 
   @Column({ name: 'refresh_token', nullable: true })
   refreshToken: string;
+
+  @OneToMany(() => Session, (session) => session.user)
+  sessions: Session[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

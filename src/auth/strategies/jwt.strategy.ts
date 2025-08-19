@@ -22,20 +22,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(request: Request, payload: any) {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(request);
-
-    if (!token) throw new UnauthorizedException('No token provided');
-
-    if (!payload.sub || !payload.jti) {
-      this.logger.error('Invalid token payload');
-      throw new UnauthorizedException('Invalid token payload');
+    if (!token) {
+      throw new UnauthorizedException('Invalid token');
     }
-
-    const isValid = await this.authService.validateToken(token);
+    const isValid = await this.authService.validateSession(token);
     if (!isValid) {
-      this.logger.error(`Token for user ${payload.sub} is invalid`);
-      throw new UnauthorizedException('Token is invalid or has been revoked');
+      throw new UnauthorizedException('Invalid token');
     }
-
     return { userId: payload.sub, email: payload.email, role: payload.role };
   }
 }

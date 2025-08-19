@@ -7,10 +7,11 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy, LocalStrategy } from './strategies';
+import { Session } from '../session/entities';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Session]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

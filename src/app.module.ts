@@ -7,7 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
-import { RolesGuard } from './auth/guards/role.guard';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -38,6 +38,7 @@ import { RolesGuard } from './auth/guards/role.guard';
     }),
     UserModule,
     AuthModule,
+    SessionModule,
   ],
   controllers: [],
   providers: [

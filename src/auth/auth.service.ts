@@ -3,7 +3,6 @@ import {
   Inject,
   Injectable,
   Logger,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,8 +12,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RegisterLocalDto } from './dtos';
 import * as bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { UAParser } from 'ua-parser-js';
+import { Session } from '../session/entities';
 import { Token } from './interfaces';
 
 @Injectable()
@@ -23,6 +23,8 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Session)
+    private readonly sessionRepository: Repository<Session>,
     private readonly jwt: JwtService,
     private readonly configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -48,22 +50,49 @@ export class AuthService {
     return this.userRepository.save(user);
   }
 
-  loginLocal(user: User) {
-    return this.generateToken(user.id, user.name, user.email, user.role);
+  async login(user: User, req: any) {
+    const { access_token, refresh_token } = await this.generateToken(
+      user.id,
+      user.email,
+      user.name,
+      user.role,
+    );
+
+    const accessPayload = this.jwt.decode(access_token);
+    const refreshPayload = this.jwt.decode(refresh_token);
+
+    const access_exp = new Date(accessPayload.exp * 1000);
+    const refresh_exp = new Date(refreshPayload.exp * 1000);
+
+    const ip =
+      req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const parser = new UAParser(req.headers['user-agent']);
+    const device = `${parser.getOS().name} - ${parser.getBrowser().name}`;
+
+    const session = this.sessionRepository.create({
+      user,
+      accessToken: access_token,
+      refreshToken: refresh_token,
+      ipAddress: ip,
+      deviceName: device,
+      access_exp,
+      refresh_exp,
+    });
+
+    await this.sessionRepository.save(session);
+
+    return { access_token, refresh_token };
   }
 
   async generateToken(
     userId: number,
-    name: string,
     email: string,
+    name: string,
     role: string,
   ) {
-    const accessJti = uuidv4();
-    const refreshJti = uuidv4();
-    const [accessToken, refreshToken] = await Promise.all([
+    const [access_token, refresh_token] = await Promise.all([
       this.jwt.signAsync(
         {
-          jti: accessJti,
           sub: userId,
           email,
           name,
@@ -75,8 +104,10 @@ export class AuthService {
       ),
       this.jwt.signAsync(
         {
-          jti: refreshJti,
           sub: userId,
+          email,
+          name,
+          role,
         },
         {
           secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
@@ -85,80 +116,52 @@ export class AuthService {
       ),
     ]);
 
-    const accessPayload: any = this.jwt.decode(accessToken);
-    const refreshPayload: any = this.jwt.decode(refreshToken);
-
-    const now = Math.floor(Date.now() / 1000);
-
-    const accessTtl = Math.max((accessPayload?.exp ?? 0) - now, 0);
-    const refreshTtl = Math.max((refreshPayload?.exp ?? 0) - now, 0);
-
-    await Promise.all([
-      this.cacheManager.set(
-        `whitelist_accessToken:${accessJti}`,
-        true,
-        accessTtl * 1000,
-      ),
-      this.cacheManager.set(
-        `whitelist_refreshToken:${refreshJti}`,
-        true,
-        refreshTtl * 1000,
-      ),
-    ]);
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return { access_token, refresh_token };
   }
 
-  async validateToken(token: string) {
+  async validateSession(token: string) {
     const payload: Token | null = this.jwt.decode(token);
-
-    if (!payload?.sub || !payload?.jti) {
-      this.looger.error('Invalid token');
-      return false;
+    if (!payload) {
+      throw new UnauthorizedException('Invalid token');
     }
 
-    const whitelisted_access = await this.cacheManager.get(
-      `whitelist_accessToken:${payload.jti}`,
-    );
+    const session = await this.sessionRepository.findOne({
+      where: { accessToken: token },
+    });
 
-    if (!whitelisted_access) {
-      this.looger.error('Invalid token');
-      return false;
+    if (!session) {
+      throw new UnauthorizedException('Invalid token');
     }
 
     return payload;
   }
 
-  async jwtRefreshToken(refreshToken: string) {
-    const payload = this.jwt.verify(refreshToken, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+  async logout(accessToken: string, refreshToken: string) {
+    const session = await this.sessionRepository.findOne({
+      where: { accessToken, refreshToken },
     });
 
-    const user = await this.userRepository.findOne({
-      where: { id: payload.sub },
-    });
+    if (!session) {
+      this.looger.log('Invalid token');
+      throw new UnauthorizedException('Invalid token');
+    }
 
-    if (!user) throw new Error('User not found');
-
-    return this.generateToken(user.id, user.name, user.email, user.role);
+    await this.sessionRepository.delete(session.id);
   }
 
-  async logout(accessToken: string, refreshToken: string): Promise<void> {
-    const accessPayload: any = this.jwt.decode(accessToken);
-    const refreshPayload: any = this.jwt.decode(refreshToken);
+  async logoutDevice(userId: number, sessionId: number) {
+    const session = await this.sessionRepository.findOne({
+      where: { id: sessionId, user: { id: userId } },
+    });
 
-    if (!accessPayload?.jti || !refreshPayload?.jti) {
-      throw new UnauthorizedException('Invalid token payload');
+    if (!session) {
+      throw new UnauthorizedException('Invalid token');
     }
-    const results = await Promise.all([
-      this.cacheManager.del(`whitelist_accessToken:${accessPayload.jti}`),
-      this.cacheManager.del(`whitelist_refreshToken:${refreshPayload.jti}`),
-    ]);
 
-    this.looger.log(
-      `Logout successful. Deleted access token: ${results[0]}, refresh token: ${results[1]}`,
-    );
+    await this.sessionRepository.delete(session.id);
+  }
+
+  async logoutAll(userId: number) {
+    await this.sessionRepository.delete({ userId });
   }
 }
