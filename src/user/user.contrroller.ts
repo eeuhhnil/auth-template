@@ -17,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { QueryUserDto, UpdateUserDto } from './dtos/user.dto';
+import { Public } from '../auth/decorators';
 
 @Controller('users')
 @ApiTags('Users')

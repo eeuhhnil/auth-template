@@ -1,12 +1,16 @@
 import { Controller, Post } from '@nestjs/common';
 import { SessionService } from './session.service';
 import {
+  ApiBearerAuth,
+  ApiTags,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
 
 @Controller('session')
+@ApiTags('Session')
+@ApiBearerAuth()
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}
 

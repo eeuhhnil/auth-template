@@ -9,8 +9,8 @@ import { User } from '../../user/entities/user.entity';
 
 @Entity('sessions')
 export class Session {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => User, (user) => user.sessions, { onDelete: 'CASCADE' })
   user: User;
@@ -18,11 +18,14 @@ export class Session {
   @Column()
   userId: number;
 
-  @Column()
-  accessToken: string;
-
-  @Column()
-  refreshToken: string;
+  @Column({ type: 'uuid', unique: true })
+  refreshJti: string;
+  //
+  // @Column()
+  // accessToken: string;
+  //
+  // @Column()
+  // refreshToken: string;
 
   @Column()
   ipAddress: string;
@@ -30,10 +33,10 @@ export class Session {
   @Column()
   deviceName: string;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', nullable: true })
   access_exp: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', nullable: true })
   refresh_exp: Date;
 
   @CreateDateColumn({ type: 'timestamp' })

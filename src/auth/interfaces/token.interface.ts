@@ -5,6 +5,7 @@ export interface Token {
   email: string;
   name: string;
   role: UserRole[];
+  jti: string;
   iat: number;
   exp: number;
 }

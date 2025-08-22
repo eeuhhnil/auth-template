@@ -18,8 +18,26 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   async validate(email: string, password: string): Promise<any> {
     const user = await this.userRepository.findOne({
       where: { email },
-      select: ['id', 'email', 'name', 'createdAt', 'updatedAt', 'hashPassword'],
+      select: [
+        'id',
+        'email',
+        'name',
+        'createdAt',
+        'updatedAt',
+        'hashPassword',
+        'isActive',
+      ],
     });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException(
+        'Account is not activated. Please verify your email.',
+      );
+    }
 
     if (user && user.hashPassword) {
       const isMatch = bcrypt.compareSync(password, user.hashPassword);
@@ -28,6 +46,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         return result;
       }
     }
+
     throw new UnauthorizedException('Invalid credentials');
   }
 }
