@@ -34,5 +34,8 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unused-vars': 'off'
     },
+    'semi': ['error', 'never'],
+    '@typescript-eslint/semi': ['error', 'never'],
+    'prettier/prettier': ['error', { semi: false, singleQuote: true, trailingComma: 'all' }],
   },
 );

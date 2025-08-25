@@ -5,9 +5,9 @@ import {
   IsString,
   Max,
   Min,
-} from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+} from 'class-validator'
+import { ApiPropertyOptional } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
 
 export class PaginationDto {
   @ApiPropertyOptional({
@@ -20,7 +20,7 @@ export class PaginationDto {
   @IsInt()
   @Min(1)
   @IsOptional()
-  page?: number = 1;
+  page?: number = 1
 
   @ApiPropertyOptional({
     description: 'Number of items per page',
@@ -33,7 +33,7 @@ export class PaginationDto {
   @IsNumber()
   @Min(1)
   @Max(100)
-  limit?: number = 10;
+  limit?: number = 10
 
   @ApiPropertyOptional({
     description: 'Search term to filter results',
@@ -41,7 +41,7 @@ export class PaginationDto {
   })
   @IsString({ message: 'Search term must be a string' })
   @IsOptional()
-  search?: string;
+  search?: string
 
   @ApiPropertyOptional({
     description:
@@ -51,5 +51,5 @@ export class PaginationDto {
   })
   @IsOptional()
   @IsString()
-  sort?: string = 'createdAt:desc';
+  sort?: string = 'createdAt:desc'
 }

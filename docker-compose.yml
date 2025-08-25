@@ -19,5 +19,18 @@ services:
     ports:
       - '5432:5432'
 
+  rabbitmq:
+    networks:
+      - auth_network
+    image: rabbitmq:3-management
+    container_name: auth_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: thn
+      RABBITMQ_DEFAULT_PASS: 100700
+    ports:
+      - '5672:5672'   # cổng cho app kết nối
+      - '15672:15672' # cổng cho web management UI
+
 volumes:
   auth_database:

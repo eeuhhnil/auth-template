@@ -1,6 +1,6 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { PaginationDto } from '../../common/dtos';
+import { ApiProperty, PartialType } from '@nestjs/swagger'
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
+import { PaginationDto } from '../../common/dtos'
 
 export class CreateUserDto {
   @ApiProperty({
@@ -8,21 +8,21 @@ export class CreateUserDto {
   })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email: string
 
   @ApiProperty({
     example: 'linh',
   })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name: string
 
   @ApiProperty({
     example: 'huelinh123',
   })
   @IsString()
   @IsNotEmpty()
-  password: string;
+  password: string
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

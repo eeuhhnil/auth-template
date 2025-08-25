@@ -4,26 +4,26 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+} from 'typeorm'
+import { User } from '../../user/entities/user.entity'
 
 @Entity('otp_codes')
 export class OtpCode {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column()
-  code: string;
+  code: string
 
   @Column()
-  userId: number;
+  userId: number
 
   @ManyToOne(() => User, (user: User) => user.otps, { onDelete: 'CASCADE' })
-  user: User;
+  user: User
 
   @Column()
-  expiresAt: Date;
+  expiresAt: Date
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 }

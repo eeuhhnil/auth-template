@@ -5,47 +5,47 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from 'typeorm';
-import { UserRole } from '../enums';
-import { Session } from '../../session/entities';
-import { OtpCode } from '../../auth/entities/otp-code.entity';
+} from 'typeorm'
+import { UserRole } from '../enums'
+import { Session } from '../../session/entities'
+import { OtpCode } from '../../auth/entities/otp-code.entity'
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ unique: true })
-  email: string;
+  email: string
 
   @Column()
-  name: string;
+  name: string
 
   @Column({
     type: 'enum',
     enum: UserRole,
     default: UserRole.USER,
   })
-  role: UserRole;
+  role: UserRole
 
   @Column()
-  hashPassword: string;
+  hashPassword: string
 
   @Column({ default: false })
-  isActive: boolean;
+  isActive: boolean
 
   @Column({ name: 'refresh_token', nullable: true })
-  refreshToken: string;
+  refreshToken: string
 
   @OneToMany(() => Session, (session) => session.user)
-  sessions: Session[];
+  sessions: Session[]
 
   @OneToMany(() => OtpCode, (otp) => otp.user)
-  otps: OtpCode[];
+  otps: OtpCode[]
 
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+  updatedAt: Date
 }

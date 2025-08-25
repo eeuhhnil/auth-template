@@ -1,11 +1,10 @@
-import { UserRole } from '../../user/enums';
+import { UserRole } from '../../user/enums'
 
 export interface Token {
-  sub: string;
-  email: string;
-  name: string;
-  role: UserRole[];
-  jti: string;
-  iat: number;
-  exp: number;
+  jti: string
+  sub: string
+  name: string
+  role: UserRole[]
+  iat: number
+  exp: number
 }

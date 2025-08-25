@@ -4,22 +4,22 @@ import {
   ExecutionContext,
   CallHandler,
   HttpStatus,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+} from '@nestjs/common'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 export interface PaginationMetadata {
-  page?: number;
-  limit?: number;
-  total?: number;
-  totalPages?: number;
+  page?: number
+  limit?: number
+  total?: number
+  totalPages?: number
 }
 
 interface ApiResponse<T> {
-  statusCode: number;
-  message?: string;
-  data?: any;
-  meta?: PaginationMetadata;
+  statusCode: number
+  message?: string
+  data?: any
+  meta?: PaginationMetadata
 }
 
 @Injectable()
@@ -30,8 +30,8 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<ApiResponse<T>> {
-    const ctx = context.switchToHttp();
-    const response = ctx.getResponse();
+    const ctx = context.switchToHttp()
+    const response = ctx.getResponse()
 
     return next.handle().pipe(
       map((res) => {
@@ -40,8 +40,8 @@ export class TransformInterceptor<T>
           message: res?.message || 'SUCCESS',
           data: res?.data || res || undefined,
           meta: res?.meta || undefined,
-        };
+        }
       }),
-    );
+    )
   }
 }

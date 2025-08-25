@@ -4,10 +4,10 @@ import {
   Injectable,
   UnauthorizedException,
   ForbiddenException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { UserRole } from '../../user/enums';
-import { USER_ROLE_KEY } from '../decorators';
+} from '@nestjs/common'
+import { Reflector } from '@nestjs/core'
+import { UserRole } from '../../user/enums'
+import { USER_ROLE_KEY } from '../decorators'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -17,24 +17,24 @@ export class RolesGuard implements CanActivate {
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
       USER_ROLE_KEY,
       [context.getHandler(), context.getClass()],
-    );
+    )
 
     if (!requiredRoles || requiredRoles.length === 0) {
-      return true;
+      return true
     }
 
-    const request = context.switchToHttp().getRequest();
-    const user = request.user;
+    const request = context.switchToHttp().getRequest()
+    const user = request.user
 
     if (!user) {
-      throw new UnauthorizedException('User not authenticated');
+      throw new UnauthorizedException('User not authenticated')
     }
 
-    const hasRole = requiredRoles.some((role) => user.role === role);
+    const hasRole = requiredRoles.some((role) => user.role === role)
     if (!hasRole) {
-      throw new ForbiddenException('User does not have the required role');
+      throw new ForbiddenException('User does not have the required role')
     }
 
-    return true;
+    return true
   }
 }

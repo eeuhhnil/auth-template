@@ -6,7 +6,7 @@ import {
   Param,
   Patch,
   Query,
-} from '@nestjs/common';
+} from '@nestjs/common'
 import {
   ApiBearerAuth,
   ApiInternalServerErrorResponse,
@@ -14,10 +14,9 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
-} from '@nestjs/swagger';
-import { UserService } from './user.service';
-import { QueryUserDto, UpdateUserDto } from './dtos/user.dto';
-import { Public } from '../auth/decorators';
+} from '@nestjs/swagger'
+import { UserService } from './user.service'
+import { QueryUserDto, UpdateUserDto } from './dtos'
 
 @Controller('users')
 @ApiTags('Users')
@@ -30,7 +29,7 @@ export class UserController {
   @ApiOkResponse({ description: 'Get all users successfully.' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   async findMany(@Query() query: QueryUserDto) {
-    return this.userService.findMany(query);
+    return this.userService.findMany(query)
   }
 
   @Get(':id')
@@ -39,7 +38,7 @@ export class UserController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   async findOneById(@Param('id') id: number) {
-    return this.userService.findOneById(id);
+    return this.userService.findOneById(id)
   }
 
   @Patch(':id')
@@ -48,7 +47,7 @@ export class UserController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   async updateById(@Param('id') id: number, @Body() payload: UpdateUserDto) {
-    return this.userService.updateById(id, payload);
+    return this.userService.updateById(id, payload)
   }
 
   @Delete(':id')
@@ -57,6 +56,6 @@ export class UserController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   async deleteById(@Param('id') id: number) {
-    return this.userService.deleteById(id);
+    return this.userService.deleteById(id)
   }
 }

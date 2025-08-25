@@ -1,14 +1,13 @@
 import {
   Body,
   Controller,
-  Get,
   NotFoundException,
   Post,
   Req,
   UseGuards,
-} from '@nestjs/common';
-import { LoginDto, RefreshTokenDto, RegisterLocalDto } from './dtos';
-import { AuthService } from './auth.service';
+} from '@nestjs/common'
+import { LoginDto, RefreshTokenDto, RegisterLocalDto } from './dtos'
+import { AuthService } from './auth.service'
 import {
   ApiBearerAuth,
   ApiConflictResponse,
@@ -17,21 +16,17 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
-} from '@nestjs/swagger';
-import { Public } from './decorators';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { MailerService } from '@nestjs-modules/mailer';
-import { VerifyOtpDto } from './dtos/verify_otp.dto';
-import { ResendCodeDto } from './dtos/resend_code.dto';
+} from '@nestjs/swagger'
+import { Public } from './decorators'
+import { LocalAuthGuard } from './guards/local-auth.guard'
+import { VerifyOtpDto } from './dtos/verify_otp.dto'
+import { ResendCodeDto } from './dtos/resend_code.dto'
 
 @Controller('auth')
 @ApiTags('Auth')
 @ApiBearerAuth()
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-    private readonly mailerService: MailerService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @Post('/register')
   @Public()
@@ -40,7 +35,7 @@ export class AuthController {
   @ApiConflictResponse({ description: 'User already exists' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   async register(@Body() payload: RegisterLocalDto) {
-    return this.authService.registerLocal(payload);
+    return this.authService.registerLocal(payload)
   }
 
   @Post('/login')
@@ -50,7 +45,16 @@ export class AuthController {
   @ApiConflictResponse({ description: 'Internal Server Error.' })
   @UseGuards(LocalAuthGuard)
   async login(@Body() payload: LoginDto, @Req() req: any) {
-    return this.authService.login(req.user, req);
+    return this.authService.login(req.user, req)
+  }
+
+  @Post('refresh')
+  @Public()
+  @ApiOperation({ summary: 'Refresh token' })
+  @ApiOkResponse({ description: 'Refresh token successfully.' })
+  @ApiConflictResponse({ description: 'Internal Server Error.' })
+  async refreshToken(@Body() dto: RefreshTokenDto) {
+    return this.authService.refreshToken(dto.refresh_token)
   }
 
   @Post('/logout')
@@ -58,15 +62,15 @@ export class AuthController {
   @ApiOkResponse({ description: 'Logout successfully.' })
   @ApiConflictResponse({ description: 'Internal Server Error.' })
   async logout(@Req() req) {
-    const authHeader = req.headers.authorization;
-    const accessToken: string | undefined = authHeader?.split(' ')[1];
+    const authHeader = req.headers.authorization
+    const accessToken: string | undefined = authHeader?.split(' ')[1]
     if (!accessToken) {
-      throw new NotFoundException('No access token found in request');
+      throw new NotFoundException('No access token found in request')
     }
 
-    await this.authService.logout(accessToken);
+    await this.authService.logout(accessToken)
 
-    return { message: 'Logout successfully' };
+    return { message: 'Logout successfully' }
   }
 
   @Post('logout-device')
@@ -77,8 +81,8 @@ export class AuthController {
     @Body('userId') userId: number,
     @Body('sessionId') sessionId: string,
   ) {
-    await this.authService.logoutDevice(userId, sessionId);
-    return { message: 'Logout successfully' };
+    await this.authService.logoutDevice(userId, sessionId)
+    return { message: 'Logout successfully' }
   }
 
   @Post('logout-all')
@@ -86,8 +90,8 @@ export class AuthController {
   @ApiOkResponse({ description: 'Logout successfully.' })
   @ApiConflictResponse({ description: 'Internal Server Error.' })
   async logoutAll(@Body('userId') userId: number) {
-    await this.authService.logoutAll(userId);
-    return { message: 'Logout successfully' };
+    await this.authService.logoutAll(userId)
+    return { message: 'Logout successfully' }
   }
 
   @Post('verify-otp')
@@ -96,12 +100,12 @@ export class AuthController {
   @ApiOkResponse({ description: 'Verify otp successfully.' })
   @ApiConflictResponse({ description: 'Internal Server Error.' })
   async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
-    return this.authService.verifyOtp(verifyOtpDto);
+    return this.authService.verifyOtp(verifyOtpDto)
   }
 
   @Post('resend-code')
   @Public()
   async resendCode(@Body() resendCodeDto: ResendCodeDto) {
-    return this.authService.resendCode(resendCodeDto.email);
+    return this.authService.resendCode(resendCodeDto.email)
   }
 }

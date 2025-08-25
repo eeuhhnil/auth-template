@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { CacheModule } from '@nestjs/cache-manager';
-import { createKeyv } from '@keyv/redis';
-import { SessionModule } from './session/session.module';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { NotificationModule } from './notification/notification.module';
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { UserModule } from './user/user.module'
+import { AuthModule } from './auth/auth.module'
+import { APP_GUARD } from '@nestjs/core'
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard'
+import { CacheModule } from '@nestjs/cache-manager'
+import { createKeyv } from '@keyv/redis'
+import { SessionModule } from './session/session.module'
+import { MailerModule } from '@nestjs-modules/mailer'
+import { NotificationModule } from './notification/notification.module'
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { NotificationModule } from './notification/notification.module';
       useFactory: (configService: ConfigService) => {
         return {
           stores: [createKeyv(configService.get<string>('REDIS_URL'))],
-        };
+        }
       },
     }),
 

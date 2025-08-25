@@ -1,10 +1,10 @@
-import { Strategy } from 'passport-local';
-import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../user/entities/user.entity';
-import { Repository } from 'typeorm';
+import { Strategy } from 'passport-local'
+import { PassportStrategy } from '@nestjs/passport'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
+import * as bcrypt from 'bcrypt'
+import { InjectRepository } from '@nestjs/typeorm'
+import { User } from '../../user/entities/user.entity'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
@@ -12,7 +12,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {
-    super({ usernameField: 'email' });
+    super({ usernameField: 'email' })
   }
 
   async validate(email: string, password: string): Promise<any> {
@@ -22,31 +22,28 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         'id',
         'email',
         'name',
+        'role',
         'createdAt',
         'updatedAt',
         'hashPassword',
         'isActive',
       ],
-    });
+    })
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    if (!user) throw new UnauthorizedException('Invalid credentials')
 
-    if (!user.isActive) {
+    if (!user.isActive)
       throw new UnauthorizedException(
         'Account is not activated. Please verify your email.',
-      );
-    }
+      )
 
     if (user && user.hashPassword) {
-      const isMatch = bcrypt.compareSync(password, user.hashPassword);
+      const isMatch = bcrypt.compareSync(password, user.hashPassword)
       if (isMatch) {
-        const { hashPassword, ...result } = user;
-        return result;
+        const { hashPassword, ...result } = user
+        return result
       }
     }
-
-    throw new UnauthorizedException('Invalid credentials');
+    throw new UnauthorizedException('Invalid credentials')
   }
 }

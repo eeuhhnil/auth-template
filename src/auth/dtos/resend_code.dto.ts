@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsEmail, IsNotEmpty } from 'class-validator'
 
 export class ResendCodeDto {
   @ApiProperty({
@@ -7,5 +7,5 @@ export class ResendCodeDto {
   })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email: string
 }

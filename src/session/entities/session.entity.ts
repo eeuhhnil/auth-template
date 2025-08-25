@@ -4,44 +4,38 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+} from 'typeorm'
+import { User } from '../../user/entities/user.entity'
 
 @Entity('sessions')
 export class Session {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string
 
   @ManyToOne(() => User, (user) => user.sessions, { onDelete: 'CASCADE' })
-  user: User;
+  user: User
 
   @Column()
-  userId: number;
-
-  @Column({ type: 'uuid', unique: true })
-  refreshJti: string;
-  //
-  // @Column()
-  // accessToken: string;
-  //
-  // @Column()
-  // refreshToken: string;
+  userId: number
 
   @Column()
-  ipAddress: string;
+  ip: string
 
   @Column()
-  deviceName: string;
+  deviceName: string
 
-  @Column({ type: 'timestamp', nullable: true })
-  access_exp: Date;
+  @Column()
+  browser: string
 
-  @Column({ type: 'timestamp', nullable: true })
-  refresh_exp: Date;
+  @Column()
+  os: string
+
+  @Column({ type: 'timestamp' })
+  expiredAt: Date
 
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  createdAt: Date
 
   @CreateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+  updatedAt: Date
 }
