@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator'
+import { IsEmail, IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator'
 import { UserRole } from '../../user/enums'
 
 export class RegisterLocalDto {
@@ -18,10 +18,18 @@ export class RegisterLocalDto {
   name: string
 
   @ApiProperty({
-    example: 'huelinh123',
+    type: String,
+    example: 'Password@123',
   })
   @IsString()
   @IsNotEmpty()
+  @Matches(
+    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
+    {
+      message:
+        'Password must contain at least one uppercase letter, one number, and one special character',
+    },
+  )
   password: string
 
   @ApiProperty({ enum: UserRole, default: UserRole.USER })

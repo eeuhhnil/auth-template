@@ -15,10 +15,10 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   email: string
 
-  @Column()
+  @Column({ type: 'varchar' })
   name: string
 
   @Column({
@@ -28,13 +28,13 @@ export class User {
   })
   role: UserRole
 
-  @Column()
+  @Column({ type: 'varchar' })
   hashPassword: string
 
   @Column({ default: false })
   isActive: boolean
 
-  @Column({ name: 'refresh_token', nullable: true })
+  @Column({ type: 'text', name: 'refresh_token', nullable: true })
   refreshToken: string
 
   @OneToMany(() => Session, (session) => session.user)

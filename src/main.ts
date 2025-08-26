@@ -64,7 +64,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: [config.get<string>('RABBITMQ_URL') as string],
+      urls: [config.get<string>('RABBITMQ_URL') || ''],
       queue: config.get<string>('RABBITMQ_QUEUE'),
       queueOptions: {
         durable: true,

@@ -5,14 +5,14 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { User } from '../../user/entities/user.entity'
+import { User } from '../../user/entities'
 
 @Entity('otp_codes')
 export class OtpCode {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int' })
   id: number
 
-  @Column()
+  @Column({ type: 'text', nullable: false, unique: true })
   code: string
 
   @Column()

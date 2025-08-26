@@ -4,13 +4,14 @@ import {
   Inject,
   Injectable,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
-import { RegisterLocalDto } from './dtos'
+import { ChangePasswordDTO, RegisterLocalDto } from './dtos'
 import * as bcrypt from 'bcrypt'
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager'
 import { UAParser } from 'ua-parser-js'
@@ -79,7 +80,7 @@ export class AuthService {
     const refresh_expires =
       this.configService.get<string>('JWT_REFRESH_EXPIRES') || '7d'
     const session = this.sessionRepository.create({
-      userId: user.id,
+      user,
       ip: clientInfo.ip,
       deviceName: clientInfo.device,
       browser: clientInfo.browser,
@@ -292,5 +293,17 @@ export class AuthService {
 
   private getExpirationDate(exp: string): Date {
     return new Date(Date.now() + this.parseExpiration(exp))
+  }
+
+  async changePassword(userId: number, payload: ChangePasswordDTO) {
+    const user = await this.userRepository.findOne({ where: { id: userId } })
+    if (!user) throw new NotFoundException('Invalid user id')
+
+    const isMatch = bcrypt.compareSync(payload.oldPassword, user.hashPassword)
+    if (!isMatch) throw new UnauthorizedException('Invalid password')
+
+    user.hashPassword = bcrypt.hashSync(payload.newPassword, 10)
+
+    await this.userRepository.save(user)
   }
 }

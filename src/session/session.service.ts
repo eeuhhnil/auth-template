@@ -59,11 +59,10 @@ export class SessionService {
     return user
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
   async cleanupExpiredSessions() {
-    const deleted = await this.sessionRepository.delete({
+    await this.sessionRepository.delete({
       expiredAt: LessThan(new Date()),
     })
-    console.log(`Deleted ${deleted.affected} expired sessions`)
   }
 }

@@ -6,7 +6,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
-import { LoginDto, RefreshTokenDto, RegisterLocalDto } from './dtos'
+import {
+  ChangePasswordDTO,
+  LoginDto,
+  RefreshTokenDto,
+  RegisterLocalDto,
+} from './dtos'
 import { AuthService } from './auth.service'
 import {
   ApiBearerAuth,
@@ -21,6 +26,8 @@ import { Public } from './decorators'
 import { LocalAuthGuard } from './guards/local-auth.guard'
 import { VerifyOtpDto } from './dtos/verify_otp.dto'
 import { ResendCodeDto } from './dtos/resend_code.dto'
+import { AuthUser } from './decorators/auth-user.decorator'
+import type { AuthPayload } from './types'
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -48,6 +55,16 @@ export class AuthController {
     return this.authService.login(req.user, req)
   }
 
+  @Post('change-password')
+  @ApiOperation({ summary: 'Change password' })
+  @ApiOkResponse({ description: 'Change password successfully.' })
+  @ApiConflictResponse({ description: 'Internal Server Error.' })
+  async changePassword(
+    @Body() dto: ChangePasswordDTO,
+    @AuthUser() payload: AuthPayload,
+  ) {
+    await this.authService.changePassword(payload.sub, dto)
+  }
   @Post('refresh')
   @Public()
   @ApiOperation({ summary: 'Refresh token' })

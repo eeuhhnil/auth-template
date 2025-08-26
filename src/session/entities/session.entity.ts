@@ -4,8 +4,9 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
-import { User } from '../../user/entities/user.entity'
+import { User } from '../../user/entities'
 
 @Entity('sessions')
 export class Session {
@@ -13,15 +14,16 @@ export class Session {
   id: string
 
   @ManyToOne(() => User, (user) => user.sessions, { onDelete: 'CASCADE' })
+  // @JoinColumn({ name: 'userId' })
   user: User
 
   @Column()
   userId: number
 
-  @Column()
+  @Column({ type: 'varchar' })
   ip: string
 
-  @Column()
+  @Column({ type: 'varchar' })
   deviceName: string
 
   @Column()
@@ -36,6 +38,6 @@ export class Session {
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date
 }
