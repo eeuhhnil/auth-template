@@ -1,98 +1,321 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Auth Template
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A comprehensive authentication system built with NestJS, featuring JWT authentication, session management, email verification, and microservices architecture.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Features
 
-## Description
+### Authentication & Authorization
+- **JWT Authentication** with access and refresh tokens
+- **Local Strategy** with email/password login
+- **Role-based Access Control** (RBAC) with user roles
+- **Session Management** with device tracking
+- **Email Verification** with OTP codes
+- **Password Security** with bcrypt hashing
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### User Management
+- User registration and profile management
+- Account activation via email verification
+- Password change functionality
+- User search and pagination
+- Role-based permissions
 
-## Project setup
+### Session Management
+- Device and browser tracking
+- IP address logging
+- Session expiration handling
+- Automatic cleanup of expired sessions
+- Session listing and management
 
+### Notification System
+- **Email Notifications** via SMTP
+- **Microservices Architecture** with RabbitMQ
+- OTP code delivery
+- Account activation emails
+- Resend verification codes
+
+### Technical Features
+- **PostgreSQL** database with TypeORM
+- **Swagger/OpenAPI** documentation
+- **Docker Compose** for development
+- **Global validation** and error handling
+- **CORS** enabled for cross-origin requests
+
+## 🛠️ Tech Stack
+
+- **Framework**: NestJS (Node.js)
+- **Database**: PostgreSQL
+- **ORM**: TypeORM
+- **Cache**: Redis
+- **Message Queue**: RabbitMQ
+- **Authentication**: JWT, Passport
+- **Email**: Nodemailer
+- **Documentation**: Swagger/OpenAPI
+- **Validation**: class-validator, class-transformer
+- **Containerization**: Docker
+
+## 📋 Prerequisites
+
+- Node.js (v18 or higher)
+- Docker and Docker Compose
+- PostgreSQL (if not using Docker)
+- RabbitMQ (if not using Docker)
+
+## 🚀 Quick Start
+
+### 1. Clone the repository
 ```bash
-$ npm install
+git clone <repository-url>
+cd auth-template
 ```
 
-## Compile and run the project
-
+### 2. Install dependencies
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+### 3. Environment Configuration
+Create a `.env` file in the root directory:
 
-```bash
-# unit tests
-$ npm run test
+```env
+# Server Configuration
+PORT=3000
 
-# e2e tests
-$ npm run test:e2e
+# Database Configuration
+DATABASE_URL=postgresql://thn:100700@localhost:5432/auth
 
-# test coverage
-$ npm run test:cov
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key
+JWT_REFRESH_SECRET=your-super-secret-refresh-jwt-key
+JWT_REFRESH_EXPIRES=7d
+
+# RabbitMQ Configuration
+RABBITMQ_URL=amqp://thn:100700@localhost:5672
+RABBITMQ_QUEUE=auth_queue
+
+# Email Configuration
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USER=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### 4. Start Infrastructure Services
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker-compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+This will start:
+- PostgreSQL database on port 5432
+- RabbitMQ on ports 5672 (AMQP) and 15672 (Management UI)
 
-## Resources
+### 5. Run the Application
 
-Check out a few resources that may come in handy when working with NestJS:
+#### Development Mode
+```bash
+npm run start:dev
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+#### Production Mode
+```bash
+npm run build
+npm run start:prod
+```
 
-## Support
+The application will be available at:
+- **API**: http://localhost:3000
+- **Swagger Documentation**: http://localhost:3000/api
+- **RabbitMQ Management**: http://localhost:15672
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 📚 API Documentation
 
-## Stay in touch
+### Authentication Endpoints
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+#### Register User
+```http
+POST /auth/register
+Content-Type: application/json
 
-## License
+{
+  "email": "user@example.com",
+  "name": "John Doe",
+  "password": "Password@123"
+}
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+#### Verify Email
+```http
+POST /auth/verify-otp
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "otp": "123456"
+}
+```
+
+#### Login
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Password@123"
+}
+```
+
+#### Refresh Token
+```http
+POST /auth/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "your-refresh-token"
+}
+```
+
+#### Change Password
+```http
+POST /auth/change-password
+Authorization: Bearer <access-token>
+Content-Type: application/json
+
+{
+  "oldPassword": "OldPassword@123",
+  "newPassword": "NewPassword@123"
+}
+```
+
+### User Management Endpoints
+
+#### Get All Users
+```http
+GET /users?page=1&limit=10&search=john
+Authorization: Bearer <access-token>
+```
+
+#### Get User by ID
+```http
+GET /users/:id
+Authorization: Bearer <access-token>
+```
+
+### Session Management Endpoints
+
+#### Get All Sessions
+```http
+GET /session/get-all?page=1&limit=10
+Authorization: Bearer <access-token>
+```
+
+## 🏗️ Project Structure
+
+```
+src/
+├── auth/                   # Authentication module
+│   ├── decorators/         # Custom decorators (@Public, @Roles, etc.)
+│   ├── dtos/              # Data Transfer Objects
+│   ├── entities/          # Database entities (OtpCode)
+│   ├── guards/            # Authentication guards
+│   ├── strategies/        # Passport strategies (JWT, Local)
+│   ├── types/             # TypeScript type definitions
+│   ├── auth.controller.ts # Authentication endpoints
+│   ├── auth.service.ts    # Authentication business logic
+│   └── auth.module.ts     # Authentication module configuration
+├── user/                  # User management module
+│   ├── dtos/              # User DTOs
+│   ├── entities/          # User entity
+│   ├── enums/             # User enums (UserRole)
+│   ├── user.controller.ts # User endpoints
+│   ├── user.service.ts    # User business logic
+│   └── user.module.ts     # User module configuration
+├── session/               # Session management module
+│   ├── dtos/              # Session DTOs
+│   ├── entities/          # Session entity
+│   ├── session.controller.ts # Session endpoints
+│   ├── session.service.ts # Session business logic
+│   └── session.module.ts  # Session module configuration
+├── notification/          # Notification microservice
+│   ├── notification.controller.ts # Message handlers
+│   ├── notification.service.ts    # Notification logic
+│   └── notification.module.ts     # Notification module
+├── common/                # Shared utilities
+│   ├── dtos/              # Common DTOs (Pagination)
+│   └── interceptors/      # Global interceptors
+├── app.module.ts          # Main application module
+└── main.ts               # Application bootstrap
+```
+
+## 🔒 Security Features
+
+### Password Security
+- Passwords are hashed using bcrypt with salt rounds
+- Minimum password requirements enforced
+- Password change requires old password verification
+
+### JWT Security
+- Access tokens expire in 3 days
+- Refresh tokens expire in 7 days (configurable)
+- JWT secret should be strong and environment-specific
+
+### Session Security
+- Session tracking with device information
+- IP address logging for security monitoring
+- Automatic cleanup of expired sessions
+- Session-based token invalidation
+
+### Email Verification
+- OTP codes expire in 5 minutes
+- Account activation required before login
+- Resend OTP functionality with rate limiting
+
+
+## 🚀 Deployment
+
+### Docker Deployment
+```bash
+# Build the application
+npm run build
+
+# Build Docker image
+docker build -t auth-template .
+
+# Run with Docker Compose
+docker-compose up -d
+```
+
+### Environment Variables for Production
+Ensure all environment variables are properly set:
+- Use strong JWT secrets
+- Configure proper database credentials
+- Set up email service credentials
+- Configure Redis and RabbitMQ connections
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the UNLICENSED License.
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Check the Swagger documentation at `/api`
+- Review the code examples in the controllers
+
+## 🔄 Changelog
+
+### Version 0.0.1
+- Initial release with basic authentication
+- JWT token management
+- Email verification system
+- Session management
+- User CRUD operations
+- Microservices architecture with RabbitMQ
