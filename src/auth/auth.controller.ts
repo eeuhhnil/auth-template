@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   NotFoundException,
   Post,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common'
 import {
@@ -28,6 +30,7 @@ import { VerifyOtpDto } from './dtos/verify_otp.dto'
 import { ResendCodeDto } from './dtos/resend_code.dto'
 import { AuthUser } from './decorators/auth-user.decorator'
 import type { AuthPayload } from './types'
+import { AuthGuard } from '@nestjs/passport'
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -53,6 +56,21 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   async login(@Body() payload: LoginDto, @Req() req: any) {
     return this.authService.login(req.user, req)
+  }
+
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async auth() {}
+
+  @Public()
+  @UseGuards(AuthGuard('google'))
+  @Get('google/callback')
+  async googleCallback(@Req() req) {
+    if (!req.user)
+      throw new UnauthorizedException('Google authentication failed')
+
+    return req.user
   }
 
   @Post('change-password')

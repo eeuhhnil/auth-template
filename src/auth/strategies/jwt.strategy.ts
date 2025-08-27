@@ -24,7 +24,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(request: Request, payload: AuthPayload) {
-    console.log('Decoded JWT payload:', payload)
     if (!payload?.jti || !payload?.sub)
       throw new UnauthorizedException('Invalid JWT payload')
 

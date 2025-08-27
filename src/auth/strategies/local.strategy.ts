@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { InjectRepository } from '@nestjs/typeorm'
-import { User } from '../../user/entities/user.entity'
+import { User } from '../../user/entities'
 import { Repository } from 'typeorm'
 
 @Injectable()

@@ -158,6 +158,53 @@ export class AuthService {
     return { access_token, refresh_token }
   }
 
+  async validateGoogleUser(
+    payload: {
+      email: string
+      name: string
+      avatar?: string
+      googleId: string
+    },
+    req: Request,
+  ) {
+    const clientInfo = this.getLoginInfo(req)
+
+    let user = await this.userRepository.findOne({
+      where: { email: payload.email },
+    })
+
+    if (!user) {
+      user = this.userRepository.create({
+        email: payload.email,
+        name: payload.name,
+        avatar: payload.avatar,
+        googleId: payload.googleId,
+        provider: 'google',
+        isActive: true,
+      })
+      user = await this.userRepository.save(user)
+    } else if (!user.googleId) {
+      user.googleId = payload.googleId
+      await this.userRepository.save(user)
+    }
+
+    const refresh_expires =
+      this.configService.get<string>('JWT_REFRESH_EXPIRES') || '7d'
+
+    let session = this.sessionRepository.create({
+      user,
+      ip: clientInfo.ip,
+      deviceName: clientInfo.device,
+      browser: clientInfo.browser,
+      os: clientInfo.os,
+      expiredAt: this.getExpirationDate(refresh_expires),
+    })
+    session = await this.sessionRepository.save(session)
+
+    // generate tokens
+    return this.generateToken(user, session)
+  }
+
   async logout(token: string) {
     const payload = this.jwt.decode(token)
 

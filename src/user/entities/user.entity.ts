@@ -28,7 +28,7 @@ export class User {
   })
   role: UserRole
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   hashPassword: string
 
   @Column({ default: false })
@@ -36,6 +36,15 @@ export class User {
 
   @Column({ type: 'text', name: 'refresh_token', nullable: true })
   refreshToken: string
+
+  @Column({ nullable: true })
+  avatar?: string
+
+  @Column({ nullable: true })
+  googleId?: string
+
+  @Column({ default: 'local' })
+  provider: string
 
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[]
