@@ -12,8 +12,8 @@ RUN npm run build
 
 FROM node:20-alpine AS prod-stage
 
-COPY --from=build-stage /auth_api/dist /auth_api/dist
-COPY --from=build-stage /auth_api/package.json /auth_api/package.json
+COPY --from=builder /auth_api/dist /auth_api/dist
+COPY --from=builder /auth_api/package.json /auth_api/package.json
 
 WORKDIR /auth_api
 
