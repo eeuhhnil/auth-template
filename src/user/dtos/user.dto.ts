@@ -1,6 +1,13 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger'
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger'
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator'
 import { PaginationDto } from '../../common/dtos'
+import { UserRole } from '../enums'
 
 export class CreateUserDto {
   @ApiProperty({
@@ -25,6 +32,26 @@ export class CreateUserDto {
   password: string
 }
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+export class UpdateUserDto extends PartialType(CreateUserDto) {
+  @ApiPropertyOptional({ enum: UserRole })
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole
+}
+
+export class UpdateMeDto {
+  @ApiPropertyOptional({
+    example: 'linh',
+  })
+  @IsOptional()
+  @IsString()
+  name?: string
+
+  @ApiPropertyOptional({
+    example: true,
+  })
+  @IsOptional()
+  removeAvatar?: boolean
+}
 
 export class QueryUserDto extends PartialType(PaginationDto) {}

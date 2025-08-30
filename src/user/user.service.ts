@@ -1,12 +1,15 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { DeleteResult, FindOneOptions, ILike, Repository } from 'typeorm'
+import { DeleteResult, ILike, Repository } from 'typeorm'
 import * as bcrypt from 'bcrypt'
 import { PaginationMetadata } from '../common/interceptors'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Cache } from '@nestjs/cache-manager'
 import { User } from './entities'
-import { QueryUserDto, UpdateUserDto } from './dtos'
+import { QueryUserDto, UpdateMeDto, UpdateUserDto } from './dtos'
+import * as path from 'node:path'
+import { StorageService } from '../storage/storage.service'
+import { AuthPayload } from '../auth/types'
 
 @Injectable()
 export class UserService {
@@ -14,6 +17,7 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly storageService: StorageService,
   ) {}
 
   async findMany(
@@ -51,32 +55,57 @@ export class UserService {
     return safeUser
   }
 
-  async findOne(
-    filter: FindOneOptions<User>,
-    options: { select?: (keyof User)[] } = {},
-  ): Promise<User | null> {
-    const findOptions: FindOneOptions<User> = {
-      ...filter,
-      select: options.select,
-    }
-    return this.userRepository.findOne(findOptions)
-  }
-
   async updateById(
     id: number,
     payload: UpdateUserDto,
   ): Promise<Omit<User, 'hashPassword'>> {
+    const { password, ...rest } = payload
+
     const user = await this.userRepository.preload({
       id,
-      email: payload.email,
-      name: payload.name,
-      hashPassword: payload.password
-        ? bcrypt.hashSync(payload.password, 10)
-        : undefined,
+      ...rest,
+      hashPassword: password ? bcrypt.hashSync(password, 10) : undefined,
     })
 
     if (!user) throw new NotFoundException('User not found')
 
+    const updatedUser = await this.userRepository.save(user)
+    const { hashPassword, ...safeUser } = updatedUser
+    return safeUser
+  }
+
+  async updateMe(
+    authPayload: AuthPayload,
+    payload: UpdateMeDto,
+    file?: Express.Multer.File,
+  ): Promise<Omit<User, 'hashPassword'>> {
+    const user = await this.userRepository.findOne({
+      where: { id: authPayload.sub },
+    })
+    if (!user) throw new NotFoundException('User not found')
+
+    let avatar: string | undefined
+    if (file) {
+      const fileExtension = path.extname(file.originalname)
+      avatar = await this.storageService.uploadFile(
+        `users/avatar/${authPayload.sub}${fileExtension}`,
+        file,
+      )
+    }
+
+    if (payload.removeAvatar) {
+      const user = await this.userRepository.findOne({
+        where: { id: authPayload.sub },
+      })
+      if (user?.avatar) {
+        await this.storageService.deleteFile(
+          this.storageService.extractKeyFromUrl(user.avatar),
+        )
+      }
+    }
+    user.avatar = avatar ? avatar : user.avatar
+
+    Object.assign(user, payload)
     const updatedUser = await this.userRepository.save(user)
     const { hashPassword, ...safeUser } = updatedUser
     return safeUser

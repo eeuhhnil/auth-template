@@ -13,10 +13,10 @@ export class SessionService {
     private readonly sessionRepository: Repository<Session>,
   ) {}
 
-  async create(payload: CreateSessionDto) {
-    const session = this.sessionRepository.create(payload)
-    return await this.sessionRepository.save(session)
-  }
+  // async create(payload: CreateSessionDto) {
+  //   const session = this.sessionRepository.create(payload)
+  //   return await this.sessionRepository.save(session)
+  // }
 
   async findById(id: string) {
     return this.sessionRepository.findOne({ where: { id } })
@@ -53,11 +53,11 @@ export class SessionService {
     return { data, meta }
   }
 
-  async update(data: Partial<Omit<Session, 'id'>>) {
-    const user = await this.sessionRepository.preload(data)
-    await this.sessionRepository.save(data)
-    return user
-  }
+  // async update(data: Partial<Omit<Session, 'id'>>) {
+  //   const user = await this.sessionRepository.preload(data)
+  //   await this.sessionRepository.save(data)
+  //   return user
+  // }
 
   @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
   async cleanupExpiredSessions() {
